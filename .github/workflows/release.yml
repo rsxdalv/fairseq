@@ -19,7 +19,7 @@ jobs:
       - name: setup-python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: '3.10'
 
       - name: get next version and tag
         id: get-next-version-and-tag
@@ -78,11 +78,11 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.8'
+          python-version: '3.10'
 
       - name: Upgrade pip
         run: |
-          python3 -m pip install --upgrade pip
+          python3 -m pip install --upgrade pip==23.3.2
 
       - name: Create Source Distribution
         run: |
@@ -99,7 +99,7 @@ jobs:
     needs: get_next_version
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
       - uses: actions/checkout@v3
@@ -109,11 +109,11 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.8'
+          python-version: '3.10'
 
       - name: Upgrade pip
         run: |
-          python3 -m pip install --upgrade pip
+          python3 -m pip install --upgrade pip==23.3.2
 
       - name: Install cibuildwheel
         run: |
@@ -123,8 +123,9 @@ jobs:
         run: |
           python3 -m cibuildwheel --output-dir dist
         env:
-          CIBW_BUILD: "cp38-*64"
-          CIBW_MANYLINUX_X86_64_IMAGE: manylinux1
+          CIBW_BUILD: "cp310-*64"
+          # CIBW_MANYLINUX_X86_64_IMAGE: manylinux1
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_BEFORE_BUILD: git submodule update --init --recursive && pip install .
           # Install system library
           CIBW_BEFORE_BUILD_LINUX: (yum install -y libffi-devel || apt-get install -y libffi-devel || apk add --update --no-cache libffi-devel || true) && (yum install -y libc6 || apt-get install -y libc6 || apk add --update --no-cache libc6 || true)
