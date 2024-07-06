@@ -27,7 +27,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: Conditionally install pytorch
-      if: matrix.platform == 'windows-latest'
+      # if: matrix.platform == 'windows-latest'
       run: pip3 install torch -f https://download.pytorch.org/whl/torch_stable.html
 
     - name: Install locally
