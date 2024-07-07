@@ -86,7 +86,7 @@ jobs:
 
       - name: Create Source Distribution
         run: |
-          python3 -m pip install setuptools wheel twine torch==2.2.1
+          python3 -m pip install setuptools wheel twine torch
           python3 setup.py sdist
  
       - uses: actions/upload-artifact@v2
