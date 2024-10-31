@@ -30,6 +30,7 @@ jobs:
           python -m pip install --upgrade pip==23.3.2
           python -m pip install wheel ninja delocate
           brew install llvm libomp
+        # python -m pip install https://github.com/rsxdalv/xformers/releases/download/v0.0.27/xformers-0.0.27+184b280.d20241026-cp310-cp310-macosx_11_0_universal2.whl
         # MACOSX_DEPLOYMENT_TARGET=10.9 ARCHFLAGS="-arch arm64" CC=/opt/homebrew/opt/llvm/bin/clang CXX=/opt/homebrew/opt/llvm/bin/clang++ python setup.py bdist_wheel -d dist/ -k $PLAT_ARG
         # MACOSX_DEPLOYMENT_TARGET=10.9 ARCHFLAGS="-arch arm64" CC=/opt/homebrew/opt/llvm/bin/clang CXX=/opt/homebrew/opt/llvm/bin/clang++ python -m pip wheel . -w wheels
         #           CIBW_ENVIRONMENT: "PIP_ONLY_BINARY=numpy"
@@ -38,7 +39,7 @@ jobs:
           python -m pip install .
       - name: Build the wheel
         run: |
-          python setup.py bdist_wheel -d dist/
+          ARCHFLAGS="-arch arm64" python setup.py bdist_wheel -d dist/
       - name: Check the wheel
         run: delocate-listdeps dist/*.whl
       - run: du -h dist/*
