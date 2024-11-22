@@ -62,12 +62,13 @@ jobs:
             /bin/bash -c "
               yum install -y python3-devel gcc &&
               cd /io &&
-              python3 -m pip install torch==1.10.2 torchaudio &&
-              python3 -m pip install . &&
               python3 -m pip install setuptools wheel auditwheel &&
-              python3 setup.py bdist_wheel &&
-              auditwheel repair dist/*.whl -w /io/wheelhouse
-            "
+              python -m pip wheel /project --wheel-dir=/tmp/cibuildwheel/built_wheel --no-deps
+              "
+        #   auditwheel repair dist/*.whl -w /io/wheelhouse
+        #   python3 setup.py bdist_wheel &&
+        #   python3 -m pip install torch==1.10.2 torchaudio &&
+        #   python3 -m pip install . &&
 
       # - name: Upload Wheels as Artifact
       #   uses: actions/upload-artifact@v3
