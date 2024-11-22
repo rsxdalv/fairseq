@@ -60,7 +60,9 @@ jobs:
             -v $(pwd):/io \
             quay.io/pypa/manylinux2014_x86_64 \
             /bin/bash -c "
+            unlink /usr/bin/python || true &&
             ln -s /opt/python/cp310-cp310/bin/python /usr/bin/python &&
+            unlink /usr/bin/pip || true &&
             ln -s /opt/python/cp310-cp310/bin/pip /usr/bin/pip &&
             pip install --upgrade pip setuptools wheel auditwheel &&
             pip install torch==2.3.1 torchaudio &&
