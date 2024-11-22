@@ -64,6 +64,7 @@ jobs:
             ln -s /opt/python/cp310-cp310/bin/python /usr/bin/python &&
             unlink /usr/bin/pip || true &&
             ln -s /opt/python/cp310-cp310/bin/pip /usr/bin/pip &&
+            cd /io &&
             pip install --upgrade pip setuptools wheel auditwheel &&
             pip install torch==2.3.1 torchaudio &&
             git submodule update --init --recursive && pip install . &&
