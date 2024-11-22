@@ -63,7 +63,7 @@ jobs:
               yum install -y python3-devel gcc &&
               cd /io &&
               python3 -m pip install setuptools wheel auditwheel &&
-              python3 -m pip wheel /project --wheel-dir=/tmp/cibuildwheel/built_wheel --no-deps
+              python3 -m pip wheel /io --wheel-dir=/io/wheelhouse --no-deps
               "
         #   auditwheel repair dist/*.whl -w /io/wheelhouse
         #   python3 setup.py bdist_wheel &&
