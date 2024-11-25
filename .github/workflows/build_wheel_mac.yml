@@ -1,10 +1,10 @@
-name: Mac wheel build
+name: Build Mac Wheel
 
 on:
   workflow_dispatch:
   push:
     branches:
-      - mac-build-wheel
+      - main
 
 jobs:
   build:
@@ -18,6 +18,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Checkout submodules
+        run: git submodule update --init --recursive
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
@@ -35,14 +38,16 @@ jobs:
         # MACOSX_DEPLOYMENT_TARGET=10.9 ARCHFLAGS="-arch arm64" CC=/opt/homebrew/opt/llvm/bin/clang CXX=/opt/homebrew/opt/llvm/bin/clang++ python -m pip wheel . -w wheels
         #           CIBW_ENVIRONMENT: "PIP_ONLY_BINARY=numpy"
       - name: Install Deps
-        run: |
-          python -m pip install .
+        run: python -m pip install .
+
       - name: Build the wheel
-        run: |
-          ARCHFLAGS="-arch arm64" python setup.py bdist_wheel -d dist/
+        run: ARCHFLAGS="-arch arm64" python setup.py bdist_wheel -d dist/
+
       - name: Check the wheel
         run: delocate-listdeps dist/*.whl
+
       - run: du -h dist/*
+
       - uses: actions/upload-artifact@v4
         with:
           path: dist/*.whl
