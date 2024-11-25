@@ -1,0 +1,70 @@
+name: Build Manylinux Wheel
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    strategy:
+      max-parallel: 4
+      matrix:
+        platform: [ubuntu-latest]
+        python-version: ["3.10"]
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+        uses: actions/checkout@v4
+
+      - name: Checkout submodules
+        run: git submodule update --init --recursive
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Pull Manylinux Docker Image
+        run: docker pull quay.io/pypa/manylinux2014_x86_64
+
+      - name: Build Wheels in Manylinux
+        run: |
+          docker run --rm \
+            -v $(pwd):/io \
+            quay.io/pypa/manylinux2014_x86_64 \
+            /bin/bash -c "
+            unlink /usr/bin/python || true &&
+            ln -s /opt/python/cp310-cp310/bin/python /usr/bin/python &&
+            unlink /usr/bin/pip || true &&
+            ln -s /opt/python/cp310-cp310/bin/pip /usr/bin/pip &&
+            cd /io &&
+            pip install --upgrade pip setuptools wheel auditwheel &&
+            pip install torch==2.3.1 torchaudio &&
+            pip install . &&
+            python /io/setup.py bdist_wheel &&
+            auditwheel repair \
+                --exclude libc10_cuda.so \
+                --exclude libcaffe2_nvrtc.so \
+                --exclude libgomp-a34b3233.so.1 \
+                --exclude libtorch_cpu.so \
+                --exclude libtorch_cuda.so \
+                --exclude libtorch_python.so \
+                --exclude libc10.so \
+                --exclude libcusparseLt-f80c68d1.so.0 \
+                --exclude libshm.so \
+                --exclude libtorch_cuda_linalg.so \
+                --exclude libtorch_global_deps.so \
+                --exclude libtorch.so \
+                /io/dist/*.whl -w /io/wheelhouse
+            "
+            
+        # yum install -y python3-devel gcc &&
+
+      - run: du -h wheelhouse/*
+
+      - uses: actions/upload-artifact@v4
+        with:
+          path: wheelhouse/*.whl
