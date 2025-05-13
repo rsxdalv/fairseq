@@ -12,7 +12,12 @@ jobs:
       max-parallel: 4
       matrix:
         platform: [ubuntu-latest]
-        python-version: ["3.10"]
+        python-version: ["3.10", "3.11"]
+        include:
+          - python-version: "3.10"
+            cp_tag: "cp310-cp310"
+          - python-version: "3.11"
+            cp_tag: "cp311-cp311"
 
     runs-on: ${{ matrix.platform }}
 
@@ -37,12 +42,12 @@ jobs:
             quay.io/pypa/manylinux2014_x86_64 \
             /bin/bash -c "
             unlink /usr/bin/python || true &&
-            ln -s /opt/python/cp310-cp310/bin/python /usr/bin/python &&
+            ln -s /opt/python/${{ matrix.cp_tag }}/bin/python /usr/bin/python &&
             unlink /usr/bin/pip || true &&
-            ln -s /opt/python/cp310-cp310/bin/pip /usr/bin/pip &&
+            ln -s /opt/python/${{ matrix.cp_tag }}/bin/pip /usr/bin/pip &&
             cd /io &&
             pip install --upgrade pip setuptools wheel auditwheel &&
-            pip install torch==2.3.1 torchaudio &&
+            pip install torch==2.6.0 torchaudio &&
             pip install . &&
             python /io/setup.py bdist_wheel &&
             auditwheel repair \
@@ -58,13 +63,13 @@ jobs:
                 --exclude libtorch_cuda_linalg.so \
                 --exclude libtorch_global_deps.so \
                 --exclude libtorch.so \
-                /io/dist/*.whl -w /io/wheelhouse
+                /io/dist/*.whl -w /io/wheelhouse/${{ matrix.python-version }}
             "
-            
-        # yum install -y python3-devel gcc &&
 
-      - run: du -h wheelhouse/*
+      - name: List wheel files
+        run: du -h wheelhouse/${{ matrix.python-version }}/*
 
       - uses: actions/upload-artifact@v4
         with:
-          path: wheelhouse/*.whl
+          name: python-${{ matrix.python-version }}-wheels
+          path: wheelhouse/${{ matrix.python-version }}/*.whl
