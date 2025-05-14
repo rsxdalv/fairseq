@@ -63,6 +63,9 @@ jobs:
             cp_tag: "cp310-cp310"
           - python-version: "3.11"
             cp_tag: "cp311-cp311"
+          - python-version: "3.12"
+            cp_tag: "cp312-cp312"
+
 
     runs-on: ${{ matrix.platform }}
 
