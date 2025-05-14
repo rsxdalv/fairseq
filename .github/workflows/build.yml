@@ -9,6 +9,7 @@ on:
 jobs:
   build-mac:
     strategy:
+      fail-fast: false
       max-parallel: 4
       matrix:
         platform: [macos-14]
@@ -52,6 +53,7 @@ jobs:
 
   build-linux:
     strategy:
+      fail-fast: false
       max-parallel: 4
       matrix:
         platform: [ubuntu-latest]
@@ -119,6 +121,7 @@ jobs:
 
   build-windows:
     strategy:
+      fail-fast: false
       max-parallel: 4
       matrix:
         platform: [windows-latest]
